@@ -15,4 +15,8 @@ export interface TUser {
 
 export interface UserMethods extends Model<TUser> {
   checkIsUserExistByEmail(email: string): Promise<TUser>;
+  isPasswordMatched(
+    plainPassword: string,
+    hashPassword: string,
+  ): Promise<boolean>;
 }

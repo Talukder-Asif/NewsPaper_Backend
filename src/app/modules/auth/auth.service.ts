@@ -2,6 +2,8 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { TUser } from '../user/user.interface';
 import User from '../user/user.model';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 
 const createUserIntoDB = async (payload: TUser) => {
   const email = payload.email;
@@ -22,10 +24,31 @@ const loginUserFromDB = async (payload: TUser) => {
   if (!user) {
     throw new AppError(401, 'Invalid credentials');
   }
+  // - Checking if the user account is deleted
+  if (user.isDeleted) {
+    throw new AppError(401, 'Invalid credentials');
+  }
+  // - Checking if the user account is blocked
+  if (user.isBlocked) {
+    throw new AppError(401, 'Invalid credentials');
+  }
+  // - Verifying if the provided password is correct
+  if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
+    throw new AppError(401, 'Invalid credentials');
+  }
 
-  console.log(user);
+  const jwtPayload = {
+    userId: user?._id,
+    role: user?.role,
+  };
 
-  return null;
+  console.log(jwtPayload);
+
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: '1d',
+  });
+
+  return { Token: accessToken };
 };
 
 export const authService = {
