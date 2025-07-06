@@ -42,8 +42,6 @@ const loginUserFromDB = async (payload: TUser) => {
     role: user?.role,
   };
 
-  console.log(jwtPayload);
-
   const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
     expiresIn: '1d',
   });
