@@ -3,8 +3,9 @@ import AppError from '../errors/AppError';
 import catchAsync from '../utils/catchAsync';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
+import { TUserRole } from '../modules/user/user.interface';
 
-const auth = () => {
+const auth = (...requiredRole: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req.headers.authorization;
 
@@ -18,7 +19,16 @@ const auth = () => {
       token,
       config.jwt_access_secret as string,
     ) as JwtPayload;
-    console.log(decoded);
+
+    // Check the user's role for authorization
+    const role = decoded.role;
+
+    if (requiredRole.length > 0 && !requiredRole.includes(role)) {
+      throw new AppError(
+        status.FORBIDDEN,
+        'You do not have sufficient permissions!',
+      );
+    }
 
     // Send decoded info in the request of express
     req.user = decoded;
