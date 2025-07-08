@@ -21,4 +21,14 @@ router.patch(
   blogPostController.updateBlogPost,
 );
 
+router.patch(
+  '/:id',
+  validateRequest(blogPostValidation.updateBlogPostZodSchema),
+  auth(),
+  blogPostController.updateBlogPost,
+);
+
+router.delete('/:id', auth(), blogPostController.deleteBlogPost);
+router.get('/', blogPostController.deleteBlogPost);
+
 export const blogPostRoutes = router;

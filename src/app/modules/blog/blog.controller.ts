@@ -30,7 +30,39 @@ const updateBlogPost = catchAsync(async (req, res) => {
   });
 });
 
+// Delete an BlogPost
+const deleteBlogPost = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.userId;
+
+  const result = await blogService.deleteBlogPostIntoDB(id, userId);
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Blog Post is deleted successfully',
+    data: result,
+  });
+});
+
+// Delete an BlogPost
+const getBlogPost = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.userId;
+
+  const result = await blogService.getBlogPostIntoDB(id, userId);
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Blog Post is deleted successfully',
+    data: result,
+  });
+});
+
 export const blogPostController = {
   createBlogPost,
   updateBlogPost,
+  deleteBlogPost,
+  getBlogPost,
 };
